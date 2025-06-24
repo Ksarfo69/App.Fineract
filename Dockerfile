@@ -19,15 +19,19 @@ FROM openjdk:19-jdk AS builder
 
 ARG GITHUB_PAT
 ARG JAR_URL="https://api.github.com/repos/Ksarfo69/App.Fineract/releases/assets/266932013"
+ARG PUBLIC_URL="https://github.com/Ksarfo69/App.Fineract/releases/download/v1.0.0/fineract-provider.jar"
 ARG JAR_NAME="fineract-provider.jar"
 
 WORKDIR /app
 
 # Download the JAR file
+#RUN microdnf install -y curl && curl -v \
+#                                -H "Accept: application/octet-stream" \
+#                                -H 'Authorization: token $GITHUB_PAT' \
+#                                -L $JAR_URL \
+#                                -o $JAR_NAME && microdnf clean all
 RUN microdnf install -y curl && curl -v \
-                                -H "Accept: application/octet-stream" \
-                                -H 'Authorization: token $GITHUB_PAT' \
-                                -L $JAR_URL \
+                                -L $PUBLIC_URL \
                                 -o $JAR_NAME && microdnf clean all
 
 EXPOSE 8080
