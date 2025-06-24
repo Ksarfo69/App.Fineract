@@ -17,7 +17,14 @@
 #
 FROM openjdk:19-jdk AS builder
 
-COPY ./fineract-provider/build/libs /usr/fineract
-WORKDIR /usr/fineract
+ENV JAR_URL="https://github.com/Ksarfo69/App.Fineract/releases/download/v1.0.0/fineract-provider.jar"
+ENV JAR_NAME="fineract-provider.jar"
+
+WORKDIR /app
+
+# Download the JAR file
+RUN microdnf install -y curl && curl -L $JAR_URL -o $JAR_NAME && microdnf clean all
+
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "fineract-provider.jar"]
