@@ -1,7 +1,6 @@
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!fineract-provider/build/libs/fineract-provider.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
