@@ -17,8 +17,9 @@
 #
 FROM openjdk:19-jdk AS builder
 
-ENV JAR_URL="https://api.github.com/repos/Ksarfo69/App.Fineract/releases/assets/266932013"
-ENV JAR_NAME="fineract-provider.jar"
+ARG GITHUB_PAT
+ARG JAR_URL="https://api.github.com/repos/Ksarfo69/App.Fineract/releases/assets/266932013"
+ARG JAR_NAME="fineract-provider.jar"
 
 WORKDIR /app
 
