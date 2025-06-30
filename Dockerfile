@@ -30,10 +30,8 @@ WORKDIR /app
 #                                -H 'Authorization: token $GITHUB_PAT' \
 #                                -L $JAR_URL \
 #                                -o $JAR_NAME && microdnf clean all
-RUN microdnf install -y curl && curl -v \
+RUN microdnf install -y curl && curl \
                                 -L $PUBLIC_URL \
                                 -o $JAR_NAME && microdnf clean all
-
-EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "fineract-provider.jar"]
