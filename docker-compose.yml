@@ -20,23 +20,25 @@ version: "3.8"
 
 services:
 
-#  fineract-db:
-#    container_name: fineract-db
-#    image: postgres:16.1
-#    restart: always
-#    environment:
-#      - POSTGRES_USER=${POSTGRES_USER}
-#      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-#      - FINERACT_DB_USER=${FINERACT_DB_USER}
-#      - FINERACT_DB_PASS=${FINERACT_DB_PASS}
-#      - FINERACT_TENANTS_DB_NAME=${FINERACT_TENANTS_DB_NAME}
-#      - FINERACT_TENANT_DEFAULT_DB_NAME=${FINERACT_TENANT_DEFAULT_DB_NAME}
-#    healthcheck:
-#      test: [ "CMD", "pg_isready", "-q", "-d", "${FINERACT_DB_USER}", "-U", "${POSTGRES_USER}" ]
-#      timeout: 10s
-#      retries: 10
-#    ports:
-#      - "${POSTGRES_PORT}:5432"
+  fineract-db:
+    container_name: fineract-db
+    image: postgres:16.1
+    restart: always
+    volumes:
+      - ${PWD}/01-init.sh:/docker-entrypoint-initdb.d/01-init.sh:Z,ro
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - FINERACT_DB_USER=${FINERACT_DB_USER}
+      - FINERACT_DB_PASS=${FINERACT_DB_PASS}
+      - FINERACT_TENANTS_DB_NAME=${FINERACT_TENANTS_DB_NAME}
+      - FINERACT_TENANT_DEFAULT_DB_NAME=${FINERACT_TENANT_DEFAULT_DB_NAME}
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${FINERACT_DB_USER}", "-U", "${POSTGRES_USER}" ]
+      timeout: 10s
+      retries: 10
+    ports:
+      - "${POSTGRES_PORT}:5432"
 
   fineract-backend:
     container_name: fineract-backend
@@ -44,6 +46,9 @@ services:
       context: .
     ports:
       - "8443:8443"
+    depends_on:
+      fineract-db:
+        condition: service_healthy
     environment:
       - FINERACT_NODE_ID=1
       - FINERACT_HIKARI_DRIVER_SOURCE_CLASS_NAME=org.postgresql.Driver
@@ -84,13 +89,14 @@ services:
       - FINERACT_MANAGEMENT_ENDPOINT_WEB_EXPOSURE_INCLUDE=health,info,prometheus
       - FINERACT_MANAGEMENT_METRICS_TAGS_APPLICATION=fineract
       - FINERACT_REMOTE_JOB_MESSAGE_HANDLER_SPRING_EVENTS_ENABLED=true
-      - FINERACT_INSECURE_HTTP_CLIENT=${FINERACT_SSL}
+      - FINERACT_INSECURE_HTTP_CLIENT=${FINERACT_ALLOW_INSECURE}
       - SPRING_PROFILES_ACTIVE=test,diagnostics
       - OTEL_SERVICE_NAME=fineract
+
   # Frontend service
-#  fineract-userinterface:
-#    image: openmf/community-app:latest
-#    container_name: fineract-userinterface
-#    restart: always
-#    ports:
-#      - 9090:80
+  fineract-userinterface:
+    image: openmf/community-app:latest
+    container_name: fineract-userinterface
+    restart: always
+    ports:
+      - 9090:80
